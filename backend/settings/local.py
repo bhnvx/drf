@@ -7,7 +7,7 @@ env = read_env(base_dir=BASE_DIR)
 SECRET_KEY = env['DJANGO_SECRET_KEY']
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'backend.urls'
 
 DATABASES = {
     'default': {
