@@ -5,6 +5,9 @@ from django.utils.translation import gettext_lazy as _
 class CustomUserManager(BaseUserManager):
 
     def create_user(self, username, password, **extra_fields):
+
+        if not password:
+            raise ValueError(_('Password is empty.'))
         user = self.model(username=username, password=password, **extra_fields)
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
