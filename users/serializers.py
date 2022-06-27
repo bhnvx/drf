@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.hashers import check_password
 from .models import Users
 
 from allauth.account import app_settings as allauth_settings
@@ -46,15 +47,20 @@ class CustomRegisterSerializer(serializers.Serializer):
 
 
 class UserPasswordResetSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True, write_only=True)
+    old_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True)
     confirm_password = serializers.CharField(required=True, write_only=True)
 
-    def validate_password(self, data):
-        if not data.get('new_password', False) or not data.get('confirm_password', False):
-            raise serializers.ValidationError(_("`new password` or `confirm password` is not exists."))
-        if data['new_password'] != data['confirm_password']:
-            raise serializers.ValidationError(_("The two password fields didn't match."))
-        if len(data['new_password']) >= 21:
-            raise serializers.ValidationError(_("Password is too long."))
-        return data
+    def validate_password(self, request, data):
+        if check_password(data.get('old_password', False), request.user.password):
+            if not data.get('new_password', False) or not data.get('confirm_password', False):
+                raise serializers.ValidationError(_("`new password` or `confirm password` is not exists."))
+            if data['new_password'] != data['confirm_password']:
+                raise serializers.ValidationError(_("The two password fields didn't match."))
+            return data
+        else:
+            raise serializers.ValidationError(_("`old password` is not correct."))
+
+    def save(self, user, data):
+        user.set_password(data.get('new_password'))
+        user.save()

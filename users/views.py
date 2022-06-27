@@ -24,6 +24,10 @@ class UserViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(self.request)
 
+    def perform_update(self, serializer):
+        data = serializer.validate_password(self.request, self.request.data)
+        serializer.save(self.request.user, data)
+
     def perform_destroy(self, instance):
         instance.delete()
         
@@ -38,9 +42,10 @@ class UserViewSet(ModelViewSet):
         self.authentication_classes = None
         return super(UserViewSet, self).create(request, *args, **kwargs)
     
-    def partial_update(self, request, *args, **kwargs):
-        # ...
-        return super(UserViewSet, self).partial_update(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = UserPasswordResetSerializer
+        super(UserViewSet, self).update(request, *args, **kwargs)
+        return response.Response({"msg": "success."}, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         super(UserViewSet, self).destroy(request, *args, **kwargs)
