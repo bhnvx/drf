@@ -43,3 +43,18 @@ class CustomRegisterSerializer(serializers.Serializer):
         user.type = self.cleaned_data.get('type')
         user.save()
         return user
+
+
+class UserPasswordResetSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True)
+    confirm_password = serializers.CharField(required=True, write_only=True)
+
+    def validate_password(self, data):
+        if not data.get('new_password', False) or not data.get('confirm_password', False):
+            raise serializers.ValidationError(_("`new password` or `confirm password` is not exists."))
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError(_("The two password fields didn't match."))
+        if len(data['new_password']) >= 21:
+            raise serializers.ValidationError(_("Password is too long."))
+        return data
