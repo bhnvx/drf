@@ -1,15 +1,15 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import permissions, authentication
+from rest_framework import permissions, authentication, response, status
 
 from .models import Users
 from .permissions import IsUser
-from .serializers import UserSerializer, CustomRegisterSerializer
+from .serializers import UserSerializer, CustomRegisterSerializer, UserPasswordResetSerializer
 
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, IsUser]
-    authentication = [authentication.TokenAuthentication, ]
+    authentication_classes = [authentication.TokenAuthentication, ]
     http_method_names = ['get', 'post', 'patch', 'delete', ]
     queryset = Users.objects.all()
 
@@ -23,6 +23,9 @@ class UserViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(self.request)
+
+    def perform_destroy(self, instance):
+        instance.delete()
         
     def list(self, request, *args, **kwargs):
         return super(UserViewSet, self).list(request, *args, **kwargs)
@@ -40,5 +43,5 @@ class UserViewSet(ModelViewSet):
         return super(UserViewSet, self).partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # ...
-        return super(UserViewSet, self).destroy(request, *args, **kwargs)
+        super(UserViewSet, self).destroy(request, *args, **kwargs)
+        return response.Response({"msg": "success."}, status=status.HTTP_200_OK)
