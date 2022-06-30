@@ -7,7 +7,7 @@ from users.models import Users
 
 class UserInfoViewSet(GenericViewSet):
     permission_classes = [permissions.IsAuthenticated, ]
-    http_method_names = ['get', 'post', 'patch', 'delete', ]
+    http_method_names = ['get', ]
     queryset = Users.objects.all()
 
     @action(methods=['GET'], detail=False, url_path="me")
