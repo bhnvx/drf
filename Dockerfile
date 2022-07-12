@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 RUN sed -i 's/archive.ubuntu.com/ftp.kaist.ac.kr/g' /etc/apt/sources.list
 RUN apt-get update && apt-get install -y software-properties-common
+
 # Completed not yet
 
 EXPOSE 8000
