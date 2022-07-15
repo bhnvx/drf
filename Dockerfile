@@ -1,8 +1,13 @@
 FROM ubuntu:18.04
+
 RUN sed -i 's/archive.ubuntu.com/ftp.kaist.ac.kr/g' /etc/apt/sources.list
 RUN apt-get update && apt-get install -y software-properties-common
 
-# Completed not yet
+WORKDIR /drf/
+
+ADD requirements.txt .
+
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 EXPOSE 8000
 CMD ["bash", "-c", "python manage.py collectstatic --noinput --settings=backend.settings.deploy &&\

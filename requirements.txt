@@ -16,6 +16,8 @@ defusedxml==0.7.1
 Deprecated==1.2.13
 Django==4.0.5
 django-allauth==0.51.0
+django-celery-results==2.4.0
+django-redis==5.2.0
 djangorestframework==3.13.1
 idna==3.3
 kombu==5.2.4
