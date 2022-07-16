@@ -1,3 +1,9 @@
-from django.test import TestCase
+from test_plus.test import TestCase
+from django.contrib.auth.models import User
 
-# Create your tests here.
+
+class UserTestCase(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+    # ...
