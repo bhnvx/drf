@@ -59,5 +59,20 @@ class UserTestCase(TestCase):
     def test_user_create(self):
         res = self.client.post(
             path="/api/v1/users/",
-            data={"username": None, "password1": None, "password2": None}
+            data={"username": "test_user1", "password1": "dues#0211", "password2": "dues#0211"}
         )
+        self.assertEqual(res.status_code, 201)
+
+    def test_exsist_username(self):
+        res = self.client.post(
+            path="/api/v1/users/",
+            data={"username": "user1", "password1": "dues#0211", "password2": "dues#0211"}
+        )
+        self.assertEqual(res.status_code, 400)
+
+    def test_create_user_password_1_2_not_same(self):
+        res = self.client.post(
+            path="/api/v1/users/",
+            data={"username": "test_user1", "password1": "dues#0211", "password2": "dues#0212"}
+        )
+        self.assertEqual(res.status_code, 400)
