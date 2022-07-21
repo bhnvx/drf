@@ -12,9 +12,6 @@ class UserTestCase(TestCase):
         self.User1 = User.objects.create(username="user1")
         self.User2 = User.objects.create(username="user2")
 
-        # URL Path
-        self.url = "/api/v1/"
-
     def test_admin_get_user(self):
         self.client.force_login(self.AdminUser)
         token = Token.objects.get(user_id=self.AdminUser.id)
@@ -59,20 +56,28 @@ class UserTestCase(TestCase):
     def test_user_create(self):
         res = self.client.post(
             path="/api/v1/users/",
-            data={"username": "test_user1", "password1": "dues#0211", "password2": "dues#0211"}
+            data={"username": "test_user1", "password1": "12345678", "password2": "12345678"}
         )
         self.assertEqual(res.status_code, 201)
 
     def test_exsist_username(self):
         res = self.client.post(
             path="/api/v1/users/",
-            data={"username": "user1", "password1": "dues#0211", "password2": "dues#0211"}
+            data={"username": "user1", "password1": "12345678", "password2": "12345678"}
         )
         self.assertEqual(res.status_code, 400)
 
     def test_create_user_password_1_2_not_same(self):
         res = self.client.post(
             path="/api/v1/users/",
-            data={"username": "test_user1", "password1": "dues#0211", "password2": "dues#0212"}
+            data={"username": "test_user1", "password1": "12345678", "password2": "12345677"}
         )
         self.assertEqual(res.status_code, 400)
+
+    # 유저 비밀번호 수정 성공
+
+    # 유저 비밀번호 수정 실패
+
+    # 유저 삭제 성공
+
+    # 유저 삭제 실패
