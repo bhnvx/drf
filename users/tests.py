@@ -74,9 +74,56 @@ class UserTestCase(TestCase):
         )
         self.assertEqual(res.status_code, 400)
 
-    # 유저 비밀번호 수정 성공
+    def test_change_user_password(self):
+        self.test_user_create()
+        user = User.objects.get(username="test_user1")
+        token = Token.objects.get(user_id=user.id)
+        headers = {'HTTP_AUTHORIZATION': f"Token {token}"}
 
-    # 유저 비밀번호 수정 실패
+        res = self.client.patch(
+            path=f"/api/v1/users/{user.id}/",
+            data={"old_password": "12345678", "new_password": "123123123", "confirm_password": "123123123"},
+            content_type="application/json",
+            **headers
+        )
+        self.assertEqual(res.status_code, 200)
+
+    def test_change_user_password_failed(self):
+        self.test_user_create()
+        user = User.objects.get(username="test_user1")
+        token = Token.objects.get(user_id=user.id)
+        headers = {'HTTP_AUTHORIZATION': f"Token {token}"}
+
+        # CASE1.
+        res = self.client.patch(
+            path=f"/api/v1/users/{user.id}/",
+            data={"old_password": "12345677", "new_password": "123123123", "confirm_password": "123123123"},
+            content_type="application/json",
+            **headers
+        )
+        self.assertEqual(res.status_code, 400)
+
+        # CASE2.
+        res = self.client.patch(
+            path=f"/api/v1/users/{user.id}/",
+            data={"old_password": "12345678", "new_password": "12312312", "confirm_password": "123123123"},
+            content_type="application/json",
+            **headers
+        )
+        self.assertEqual(res.status_code, 400)
+
+        # CASE3.
+        fake_user = User.objects.get(id=self.User1.id)
+        fake_token = Token.objects.get(user_id=fake_user.id)
+        fake_headers = {'HTTP_AUTHORIZATION': f"Token {fake_token}"}
+
+        res = self.client.patch(
+            path=f"/api/v1/users/{user.id}/",
+            data={"old_password": "12345678", "new_password": "123123123", "confirm_password": "123123123"},
+            content_type="application/json",
+            **fake_headers
+        )
+        self.assertEqual(res.status_code, 403)
 
     # 유저 삭제 성공
 
