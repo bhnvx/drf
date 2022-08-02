@@ -30,10 +30,10 @@ class UserTestCase(TestCase):
 
         for query in quesryset:
             res = self.client.get(
-                path=f"/api/v1/users/{query.id}",
+                path=f"/api/v1/users/{query.id}/",
                 **headers
             )
-            self.assertRedirects(res, f"/api/v1/users/{query.id}/", status_code=301, target_status_code=200)
+            self.assertEqual(res.status_code, 200)
 
     def test_not_admin_get_user(self):
         self.client.force_login(self.User1)
@@ -48,10 +48,10 @@ class UserTestCase(TestCase):
 
         pk = User.objects.get(id=self.User2.id).id
         res = self.client.get(
-            path=f"/api/v1/users/{pk}",
+            path=f"/api/v1/users/{pk}/",
             **headers
         )
-        self.assertRedirects(res, f"/api/v1/users/{pk}/", status_code=301, target_status_code=403)
+        self.assertEqual(res.status_code, 403)
 
     def test_user_create(self):
         res = self.client.post(
@@ -125,6 +125,26 @@ class UserTestCase(TestCase):
         )
         self.assertEqual(res.status_code, 403)
 
-    # 유저 삭제 성공
+    def test_user_destroy(self):
+        self.client.force_login(self.User1)
+        user = User.objects.get(id=self.User1.id)
+        token = Token.objects.get(user_id=self.User1.id)
+        headers = {'HTTP_AUTHORIZATION': f"Token {token}"}
 
-    # 유저 삭제 실패
+        res = self.client.delete(
+            path=f"/api/v1/users/{user.id}/",
+            **headers
+        )
+        self.assertEqual(res.status_code, 200)
+
+    def test_user_destroy_another_user(self):
+        self.client.force_login(self.User1)
+        user = User.objects.get(id=self.User2.id)
+        token = Token.objects.get(user_id=self.User1.id)
+        headers = {'HTTP_AUTHORIZATION': f"Token {token}"}
+
+        res = self.client.delete(
+            path=f"/api/v1/users/{user.id}/",
+            **headers
+        )
+        self.assertEqual(res.status_code, 403)
