@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.7"
 
 services:
   # POSTGRESQL
@@ -28,15 +28,17 @@ services:
 
   # Django
   api:
-    image: drf_test:0.0.1
+    build: .
     hostname: drf_test
 
     depends_on:
       - db
-      - redis
+#      - redis
     volumes:
       - .:/drf
       - /etc/localtime:/etc/localtime:ro
+    secrets:
+      - DJANGO_SECRET_KEY
 
     deploy:
       replicas: 1
@@ -62,7 +64,7 @@ services:
   # Nginx
   nginx:
     image: nginx:1.19.5
-    hostname: nginx
+    hostname: drf_nginx
 
     networks:
       - network

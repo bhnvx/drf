@@ -8,7 +8,7 @@ import platform
 def main():
     """Run administrative tasks."""
     if platform.system().count("Linux") > 0:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.deploy')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.local')
     else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.local')
     try:
