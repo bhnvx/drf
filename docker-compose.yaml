@@ -4,7 +4,7 @@ services:
   # POSTGRESQL
   db:
     image: postgres:9.5
-    container_name: drf_postgresql
+    hostname: drf_postgresql
 
     ports:
       - 5432:5432
@@ -29,7 +29,7 @@ services:
   # Django
   api:
     image: drf_test:0.0.1
-    container_name: drf_test
+    hostname: drf_test
 
     depends_on:
       - db
@@ -41,41 +41,66 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [ node.labels.db==db ]
+        constraints: [ node.labels.django==django ]
 
-  # Redis
-  redis:
-    containser_name: redis
-    image: redis:lastest
-
-    ports:
-      - 6379:6379
-    volumes:
-      - redis:/data
-
-    restart: unless-stopped
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [ node.labels.redis==redis ]
+#  # Redis
+#  redis:
+#    container_name: redis
+#    image: redis:lastest
+#
+#    ports:
+#      - 6379:6379
+#    volumes:
+#      - redis:/data
+#
+#    restart: unless-stopped
+#    deploy:
+#      replicas: 1
+#      placement:
+#        constraints: [ node.labels.redis==redis ]
 
   # Nginx
   nginx:
     image: nginx:1.19.5
-    container_name: nginx
+    hostname: nginx
 
     networks:
       - network
     configs:
       - source: nginx_conf
         target: /etc/nginx/nginx.conf
-    secrets:
-      - fullchain
-      - privkey
+#    secrets:
+#      - fullchain
+#      - privkey
     ports:
       - 433:433
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [ node.labels.nginx==nginx ]
 
   # Celery
-  worker:
-    image: celery:4.0
-    container_name: celery_worker
+#  worker:
+#    image: celery:4.0
+#    container_name: celery_worker
+
+configs:
+  nginx_conf:
+    file: ./nginx.conf
+
+networks:
+  network:
+    driver: overlay
+  backend:
+    driver: overlay
+
+volumes:
+  static-volume:
+  media-volume:
+  maria-database:
+
+secrets:
+  DJANGO_SECRET_KEY:
+    external: true
+  POSTG_PASSWORD:
+    external: true
